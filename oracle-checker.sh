@@ -1,26 +1,50 @@
+#!/bin/bash
+# - 08-03-2019 Modernizing some stuff
+# Initial update Steve Barcomb (sbarcomb@redhat.com)
+
+
+hugepagesz=$(grep Hugepagesize proc/meminfo | awk '{print $2}')
+hugepagenr=$(grep HugePages_Total proc/meminfo | awk '{print $2}')
+hugepagegb=$(echo "scale=2;$hugepagesz*$hugepagenr/1024/1024" | bc)
+
 echo Looking to see what io scheduler we are using and is transparent hugepages are disabled
 echo '$ grep -e elevator -e transparent proc/cmdline'
 grep -e elevator -e transparent proc/cmdline
 echo
 echo
-echo '$ grep -i huge proc/meminfo' 
-grep -i huge proc/meminfo
+echo Number of allocated hugepages:
+echo ------------------------------
+echo $hugepagenr
 echo
 echo
-echo '$ cat proc/sys/vm/swappiness' 
-echo "$( cat proc/sys/vm/swappiness) <==== we recommend 10"
+echo Total hugepage allocation in GiB:
+echo ---------------------------------
+echo $hugepagegb
 echo
-echo '$ cat proc/sys/vm/dirty_ratio'
-echo "$( cat proc/sys/vm/dirty_ratio) <==== we recommend 15"
 echo
-echo '$ cat proc/sys/vm/dirty_background_ratio'
-echo "$( cat proc/sys/vm/dirty_background_ratio) <==== we recommend 3"
+echo Swappiness value of 1-10 is recommended:
+echo ----------------------------------------
+echo "$(grep swappiness ./sos_commands/kernel/sysctl_-a)"
 echo
-echo '$cat proc/sys/vm/dirty_writeback_centisecs'
-echo "$( cat proc/sys/vm/dirty_writeback_centisecs) <==== we recommend 100"
 echo
-echo '$ cat proc/sys/vm/dirty_expire_centisecs'
-echo "$( cat proc/sys/vm/dirty_expire_centisecs) <==== we recommend 500"
+echo Dirty ratio value of 15 for large memory systems is recommended:
+echo ----------------------------------------------------------------
+echo "$(grep dirty_ratio ./sos_commands/kernel/sysctl_-a)"
+echo
+echo
+echo Dirty backgroud ratio value should be 3:
+echo ----------------------------------------
+echo "$(grep dirty_background_ratio ./sos_commands/kernel/sysctl_-a)"
+echo
+echo
+echo Dirty writeback centisecs value should be 100:
+echo ----------------------------------------------
+echo "$(grep dirty_writeback_centisecs ./sos_commands/kernel/sysctl_-a)"
+echo
+echo
+echo Dirty expire centisecs value should be 500:
+echo -------------------------------------------
+echo "$(grep dirty_expire_centisecs ./sos_commands/kernel/sysctl_-a)"
 echo
 echo
 mem=$(cat free|grep Mem|awk '{print $2}')
