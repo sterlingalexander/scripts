@@ -159,7 +159,7 @@ then
 else 
 	if [ "$rhelversion" -eq "3" ]
 	then
-		grep tuned ./sos_commands/systemd/systemctl_list-units | awk '{print $2,$3,$4}'
+		grep tuned ./sos_commands/systemd/systemctl_list-units | grep -v ksmtuned | awk '{print $2,$3,$4}'
 	elif [ "$rhelversion" -eq "2" ]
 	then
 		grep tuned chkconfig
@@ -169,20 +169,3 @@ else
 fi
 echo
 echo
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
