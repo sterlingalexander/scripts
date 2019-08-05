@@ -38,12 +38,10 @@ echo ------------------------------------------------
 
 if [ ! -f sos_commands/systemd/systemctl_list-units ] 
 then
-	echo $ grep kdump chkconfig
 	grep kdump chkconfig
 
 else
-	echo $ grep kdump ./sos_commands/systemd/systemctl_list-units
-	grep kdump ./sos_commands/systemd/systemctl_list-units
+	grep kdump ./sos_commands/systemd/systemctl_list-units | awk '{print $2,$3,$4}'
 fi
 
 echo
@@ -229,7 +227,6 @@ else
 	echo $blacklist
 	fi
 fi
-echo
 echo
 echo
 
