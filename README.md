@@ -1,6 +1,4 @@
-# scripts
-Some work scripts:
------------------
+# Some work scripts
 * case_cleanup.sh - A simple script to delete old customer data
 * getcase2 - Grabs attachments from the portal bypassing tokenization from AWS
 * kdump-checker - Prints out information related to a customer's kdump configuration
