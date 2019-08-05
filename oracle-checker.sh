@@ -86,9 +86,9 @@ echo ------------------------------
 echo $hugepagenr
 echo
 echo
-echo Total hugepage allocation in GiB:
-echo ---------------------------------
-echo $hugepagegb
+echo Total hugepage allocation:
+echo --------------------------
+echo $hugepagegb GiB,  hugepages are $hugepagesz KiB in size
 echo
 echo
 echo Swappiness value of 1-10 is recommended:
