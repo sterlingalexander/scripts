@@ -18,6 +18,7 @@ tunedinstalled=$(grep tuned installed-rpms | wc -l)
 rhelversion=$(cat uname | awk '{print $3}' | awk -F '.' '{print $1}')
 rhel56check=$(cat etc/redhat-release | awk '{print $7}' | awk -F '.' '{print $1}')
 thpcheck=$(grep transparent_hugepage proc/cmdline | wc -l)
+filecheck=$(ls sys/kernel/mm/transparent_hugepage/enabled | wc -l)
 
 syscheck=$(ls sys | grep block | wc -l)
 cmdlinecheck=$(grep elevator proc/cmdline | wc -l)
@@ -32,16 +33,31 @@ then
 	echo Transparent Huge Page detection:
 	echo --------------------------------
 	echo Red Hat Enterprise Linux 5 system, no THP
+
 elif [ "$rhel56check" -eq "6" ] && [ "$thpcheck" -eq 0 ]
 then
 	echo Transparent Huge Page detection:
 	echo --------------------------------
-	echo Red Hat Enterprise Linux 6 system, not disabled via kernel command line.
+	echo Red Hat Enterprise Linux 6 system, THP enabled.
+
 elif [ "$rhel56check" -eq "6" ] && [ "$thpcheck" -eq 1 ]
 then
 	echo Transparent Huge Page detection:
 	echo --------------------------------
 	echo Red Hat Enterprise Linux 6 system, THP disabled via kernel command line.
+
+elif [ "$filecheck" -eq 0 ] && [ "$thpcheck" -eq 0 ]
+then 
+	echo Transparent Huge Page detection:
+	echo --------------------------------
+	echo Red Hat Enterprise Linux 7 system, THP enabled.
+
+elif [ "$filecheck" -eq 0 ] && [ "$thpcheck" -eq 1 ]
+then
+        echo Transparent Huge Page detection:
+        echo --------------------------------
+        echo Red Hat Enterprise Linux 7 system, THP disabled via kernel command line.
+
 else
 	echo Transparent hugepages setting in /sys/kernel/mm/transparent_hugepage/enabled:
         echo -----------------------------------------------------------------------------
