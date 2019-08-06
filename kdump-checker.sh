@@ -110,14 +110,15 @@ nettarget=$(grep -e nfs -e net -e ssh etc/kdump.conf | grep -v ^#)
 uuidtarget=$(grep UUID etc/kdump.conf | grep -v ^# |awk '{print $2}' | awk -F "=" '{print $2}')
 devicetarget=$(grep -e ext4 -e xfs etc/kdump.conf | grep '/' | grep -v ^# | awk '{print $2}' | awk -F"/" '{print $NF}')
 pathtarget=$(grep path etc/kdump.conf | grep -v ^# | awk '{print $2}')
+dfexists=$(ls | grep df | wc -l)
 
-if [[ $nettarget ]]
+if [[ $nettarget ]] && [ "$dfexists" -ne 0 ]
 then 
 	echo Dump target size:
 	echo -----------------
 	echo Remote dump target, please check this manually 
 
-elif [[ $uuidtarget ]]
+elif [[ $uuidtarget ]] && [ "$dfexists" -ne 0 ]
 then uuidfs=$(grep $uuidtarget ./sos_commands/block/blkid* | awk '{print $1}'| tr -d ':') 	
 	uuidfszkb=$(grep $uuidfs df | awk '{print $4}')
 	uuidfszgb=$(echo "scale=2;$uuidfszkb"/1024/1024 | bc)
@@ -132,7 +133,7 @@ then uuidfs=$(grep $uuidtarget ./sos_commands/block/blkid* | awk '{print $1}'| t
 	else
 		:
 	fi
-elif [[ $devicetarget ]]
+elif [[ $devicetarget ]]  && [ "$dfexists" -ne 0 ]
 then devicefszkb=$(grep $devicetarget df | awk '{print $4}')
 	devicefszgb=$(echo "scale=2;$devicefszkb"/1024/1024 | bc)
         echo Dump target size:
@@ -146,7 +147,7 @@ then devicefszkb=$(grep $devicetarget df | awk '{print $4}')
         else
                 :
         fi
-elif [[ $pathtarget ]]
+elif [[ $pathtarget ]] && [ "$dfexists" -ne 0 ]
 then paths=$(echo "$pathtarget" | sed 's/\// /g' | awk '{for(i=NF;i>=1;i--) printf "%s ", $i;print ""}')
 	j=0
 	for i in $paths
@@ -195,6 +196,8 @@ then paths=$(echo "$pathtarget" | sed 's/\// /g' | awk '{for(i=NF;i>=1;i--) prin
 			fi
 fi
 else
+	echo Dump target size:
+	echo -----------------
 	echo Either the dump target is not local or not found in the sosreport	
 fi
 echo
