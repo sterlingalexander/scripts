@@ -1,15 +1,14 @@
 #!/bin/bash
-# Basic RCA script
 # Steve Barcomb (sbarcomb@redhat.com)
-# 2018-04-29
 
 kdumpchecker="/usr/local/bin/kdump-checker.sh"
 sarchecker="/usr/local/bin/sar-checker.sh"
+oraclechecker="/usr/local/bin/oracle-checker.sh"
+
+isoracle=$(grep ora_ ps | wc -l)
 
 mockbuild=$(grep -i mockbuild var/log/messages | sort -u)
 echo
-echo
-echo "****** Basic Data ******"
 echo
 echo Hostname:
 echo ---------
@@ -79,7 +78,21 @@ else
 	echo $ grep -B 20 mockbuild var/log/messages
 	grep -B 20 mockbuild var/log/messages
 fi
+$sarchecker
 echo
+echo
+echo Checking for Oracle workload:
+echo -----------------------------
+if [ "$isoracle" -eq 0 ]
+then
+	echo No Oracle processes found
+else
+	echo Oracle processes found. 
+	echo
+	echo
+	echo Tuning details:
+	$oraclechecker
+fi
 echo
 
 $kdumpchecker

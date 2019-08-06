@@ -26,8 +26,6 @@ elevator=$(grep elevator proc/cmdline | sed 's/^.*\(elevator.*\).*$/\1/' | awk '
 
 filedescriptors=$(grep oracle etc/security/limits.conf | grep hard | grep nofile)
 
-echo
-echo
 if [ "$rhel56check" -eq "5" ]
 then
 	echo Transparent Huge Page detection:
@@ -167,5 +165,3 @@ else
 		echo tuned information not found in sosreport, manually verify
 	fi
 fi
-echo
-echo
