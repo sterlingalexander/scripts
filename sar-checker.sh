@@ -1,39 +1,37 @@
 #!/bin/bash
 # 07/26/2019 - Initial version
 
+rebootevents=$(for i in $(find . -type f -name sar* | grep -v xml); do grep RESTART $i | awk '{print $1,$2}' | tr '\n' ' '; echo $i;done | grep -v ^'./')
+sarfilename=$(echo $rebootevents | awk '{print $NF}')
+reboottime=$(echo $rebootevents | awk '{print $1,$2}')
 
-jan=01
-feb=02
-mar=03
-apr=04
-may=05
-jun=06
-jul=07
-aug=08
-sep=09
-oct=10
-nov=11
-dec=12
-
-sosmonth=$(cat date |  awk '{print $2}')
-sosdate=$(cat date | awk '{print $3}')
-soshour=$(cat date |  awk '{print $4}' | awk -F ':' '{print $1}')
-sosminute=$(cat date | awk '{print $4}' | awk -F ':' '{print $2}')
-
-sosdateraw=$(echo $sosdate | wc -w)
-if [ $sosdateraw -eq 1 ]
-then
-	sosdate2d=$(echo $sosdate | sed 's/^/0/g')
-else
-	sosdate2d=$sosdateraw
-fi
-
-sarfilename=$(echo $sosdate2d | sed 's/^/sar/g')
-sarfileloc=$(find . -name $sarfilename)
-sarfilemonth=$(head -n1 $sarfileloc | awk '{print $4}' | awk -F '/' '{print $1}')
-sarfiledate=$(head -n1 $sarfileloc | awk '{print $4}' | awk -F '/' '{print $2}')
-sarfileyear=$(head -n1 $sarfileloc | awk '{print $4}' | awk -F '/' '{print $3}')
-echo $sarfilemonth
-echo $sarfiledate
-echo $sarfileyear
-
+echo 
+echo
+echo Reboot time:
+echo ------------
+echo $reboottime
+echo
+echo
+echo Data being used:
+echo ----------------
+head -n1 var/log/sa/sar23 | awk '{print $3,$4}'
+echo
+echo
+echo Number of CPUs:
+echo ---------------
+head -n1 var/log/sa/sar23 | awk '{print $(NF-1)}' | sed 's/(//g'
+echo
+echo
+echo Load averages:
+echo --------------
+grep -m1 ldavg $sarfilename;sed -n -e '/ldavg/,/Average/ p' $sarfilename | grep -m 1 -B 10 Average 
+echo
+echo
+echo Memory Usage:
+echo -------------
+grep -m1 mem $sarfilename;sed -n -e '/mem/,/Average/ p' $sarfilename | grep -m 1 -B 10 Average 
+echo
+echo
+echo Swap Usage:
+echo -----------
+grep -m1 swpfree $sarfilename;sed -n -e '/swpfree/,/Average/ p' $sarfilename | grep -m 1 -B 10 Average
