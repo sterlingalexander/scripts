@@ -14,12 +14,12 @@ echo
 echo
 echo Data being used:
 echo ----------------
-head -n1 var/log/sa/sar23 | awk '{print $3,$4}'
+head -n1 $sarfilename | awk '{print $3,$4}'
 echo
 echo
 echo Number of CPUs:
 echo ---------------
-head -n1 var/log/sa/sar23 | awk '{print $(NF-1)}' | sed 's/(//g'
+head -n1 $sarfilename | awk '{print $(NF-1)}' | sed 's/(//g'
 echo
 echo
 echo Load averages:
