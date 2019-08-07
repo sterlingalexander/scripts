@@ -155,14 +155,18 @@ then paths=$(echo "$pathtarget" | sed 's/\// /g' | awk '{for(i=NF;i>=1;i--) prin
 		number=$(grep "$i"$ df | awk '{print $(NF)}' | grep -v ^'/sys' | grep -v ^'/var/lib' | wc -l)
 		if [ $number -ne 0 ]
 		then	
-			if [ $number -ne 0 ] && [ $j -ne 0 ]
+			if [ $number -ne 0 ] && [ $j -eq 0 ]
 			then
+				dir=$(grep $i df | grep -v '^/dev' | awk '{print $(NF)}')
+				break
+			else
 				dir=$i
 				break
 			fi
 		else 
 			dir="root"
 			let "j=j+1"
+
 		fi
 	done
 	if [ $dir = root ]
@@ -181,7 +185,7 @@ then paths=$(echo "$pathtarget" | sed 's/\// /g' | awk '{for(i=NF;i>=1;i--) prin
 			:
 		fi
 	else
-		pathszkb=$(grep "$dir"$ df| awk '{print $(NF-2)}')
+		pathszkb=$(grep "$dir"$ df | awk '{print $(NF-2)}')
 		pathszgb=$(echo "scale=2;$pathszkb"/1024/1024 | bc)
 		echo Dump target size:
 		echo -----------------
