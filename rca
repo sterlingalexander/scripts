@@ -78,7 +78,7 @@ else
 	echo $ grep -B 20 mockbuild var/log/messages
 	grep -B 20 mockbuild var/log/messages
 fi
-$sarchecker
+#$sarchecker
 echo
 echo
 echo Checking for Oracle workload:
@@ -95,4 +95,4 @@ else
 fi
 echo
 
-$kdumpchecker
+#$kdumpchecker
