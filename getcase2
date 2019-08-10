@@ -72,5 +72,5 @@ else
 	echo "Command Syntax:"
 	echo "   caseget <casenumber> <attachment>"
 	echo
-	echo "If no case number is provided all attachments will be downloaded"
+	echo "If no attachment is provided all attachments will be downloaded"
 fi
