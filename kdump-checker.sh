@@ -98,7 +98,7 @@ echo $memtotalgb GiB
 echo
 echo
 
-nettarget=$(grep -e nfs -e net -e ssh etc/kdump.conf | grep -v ^#) 
+nettarget=$(grep -e nfs -e net -e ssh etc/kdump.conf | grep -v sshkey | grep -v ^#) 
 uuidtarget=$(grep UUID etc/kdump.conf | grep -v ^# |awk '{print $2}' | awk -F "=" '{print $2}')
 devicetarget=$(grep -e ext4 -e xfs etc/kdump.conf | grep '/' | grep -v ^# | awk '{print $2}' | awk -F"/" '{print $NF}')
 pathtarget=$(grep path etc/kdump.conf | grep -v ^# | awk '{print $2}')
