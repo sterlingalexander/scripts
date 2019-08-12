@@ -1,13 +1,5 @@
 #!/bin/bash
-# Kdump checking script by Steve Barcomb (sbarcomb@redhat.com)
-#
-# - 08-03-2019 Fixed issue where df filesystems were output on multiple lines.  Count from NF not $1
-# - 07-26-2019 Added remote target detection, results were unpredictable.  Fixed HPSA firmware reporting, hopefully works this time.  Moved vmcore-dmesg detection. Changed root filesystem detection so that it looks for just / instead of lvm with a root name in it.
-# - 07-24-2019 Improved device mapper detection, changed blacklist reporting for no 3rd party modules present, no more errors for no crashkernel reservation
-# - 07-23-2019 Made blacklist checking much more robust.  Added total memory and dumptarget size for local volumes. Fixed double crash reservation arithmetic, grabs CCISS and HPSA firmware versions
-# - 04-12-2018 Added a check to for a missing crashkernel reservation so it does not report a syntax error
-# - 04-11-2018 This version will now check for systemd vs sysvinit scripts
-# It also will calculate the size of the crash kernel reservation if the sosreport captures /proc/iomem
+# Kdump configuration reporting script by Steve Barcomb (sbarcomb@redhat.com)
 
 
 
@@ -20,14 +12,14 @@ echo
 
 echo Checking for saved vmcore-dmesg.txt:
 echo ------------------------------------
-vmcore=$(find . -name vmcore.dmesg.txt 2>/dev/null)
+vmcore=$(find . -name vmcore*dmesg.txt 2>/dev/null)
 if [ -z "$vmcore" ]
 then
         echo No vmcore data found.
 	echo
 	echo
 else
-        echo $vmcore
+	for i in $vmcore;do echo $i;done
 	echo
 	echo
 fi
