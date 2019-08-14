@@ -6,7 +6,7 @@
 echo Kdump version:
 echo --------------
 echo $ grep kexec installed-rpms 
-grep kexec installed-rpms
+grep kexec installed-rpms | awk '{print $1}'
 echo
 echo
 
@@ -126,7 +126,8 @@ then uuidfs=$(grep $uuidtarget ./sos_commands/block/blkid* | awk '{print $1}'| t
 		:
 	fi
 elif [[ $devicetarget ]]  && [ "$dfexists" -ne 0 ]
-then devicefszkb=$(grep $devicetarget df | awk '{print $4}')
+# this is a hack for device mapper names where df output spans 2 lines
+then devicefszkb=$(grep -A1 $devicetarget df | tr '\n' ' '| awk '{print $4}')
 	devicefszgb=$(echo "scale=2;$devicefszkb"/1024/1024 | bc)
         echo Dump target size:
         echo -----------------
@@ -198,16 +199,18 @@ else
 fi
 echo
 echo
-
-echo Panic tunables:
-echo ---------------
-echo $ grep panic ./sos_commands/kernel/sysctl_-a
-grep panic ./sos_commands/kernel/sysctl_-a
+echo NMI Panic Tunables:
+echo -------------------
+grep panic ./sos_commands/kernel/sysctl_-a  | grep nmi
 echo
 echo
-echo Checking for sysrq keybinding:
-echo ------------------------------
-echo $ grep sysrq ./sos_commands/kernel/sysctl_-a
+echo The rest of the panic tunables:
+echo -------------------------------
+grep panic ./sos_commands/kernel/sysctl_-a | grep -v nmi
+echo
+echo
+echo Is the sysrq keybind enabled?  Do not use this for kdump:
+echo ---------------------------------------------------------
 grep sysrq ./sos_commands/kernel/sysctl_-a
 echo
 echo
@@ -233,9 +236,17 @@ if grep --quiet cciss lsmod;
 then
 	echo 'CCISS firmware version:'
 	echo '---------------------'
-	cciss=$(grep -i version proc/driver/cciss/cciss0)
-	echo CCIS Version $cciss
-	
+	cciss=$(grep -s -i version proc/driver/cciss/cciss0)
+	if [ -z "$cciss" ]
+	then	
+		echo CCISS module loaded, but unable to determine firmware version
+		echo
+		echo
+	else
+		echo CCISS Version $cciss
+		echo
+		echo
+	fi
 else
 	:
 fi
@@ -244,12 +255,20 @@ if grep --quiet hpsa lsmod;
 then
 	echo 'HPSA firmware version:'
 	echo '----------------------'
-	grep scsi ./sos_commands/kernel/dmesg | grep RAID | grep HP | sed -e 's/\[[^][]*\]//g' | grep -v hpsa | sed -e s/scsi//g | sed -e s/RAID//g | awk '{print $2,$3,"Firmware Version",$4}'
+	hpsa=$(grep -s scsi ./sos_commands/kernel/dmesg | grep RAID | grep HP | sed -e 's/\[[^][]*\]//g' | grep -v hpsa | sed -e s/scsi//g | sed -e s/RAID//g | awk '{print $2,$3,"Firmware Version",$4}')
+	if [ -z "$hpsa" ]
+	then 
+		echo HPSA module loaded, but unable to determine firmware version
+		echo
+		echo
+	else
+		echo $hpsa
+		echo
+		echo
+	fi
 else
 	:
 fi
-echo
-echo
 
 
 
