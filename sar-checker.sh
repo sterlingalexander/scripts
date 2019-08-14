@@ -1,5 +1,6 @@
 #!/bin/bash
 # 07/26/2019 - Initial version
+# Work in progress
 
 rebootevents=$(for i in $(find . -type f -name sar* | grep -v xml); do grep RESTART $i | awk '{print $1,$2}' | tr '\n' ' '; echo $i;done | grep -v ^'./')
 sarfilename=$(echo $rebootevents | awk '{print $NF}')
