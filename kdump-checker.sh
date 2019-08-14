@@ -204,6 +204,17 @@ echo -------------------
 grep panic ./sos_commands/kernel/sysctl_-a  | grep nmi
 echo
 echo
+hpwdt=$(grep hpwdt lsmod)
+if [ -z "$hpwdt" ]
+then
+	:
+else
+	echo HP system found, checking for hpwdt module:
+	echo -------------------------------------------
+	echo hpwdt module loaded
+	echo
+	echo
+fi
 echo The rest of the panic tunables:
 echo -------------------------------
 grep panic ./sos_commands/kernel/sysctl_-a | grep -v nmi
