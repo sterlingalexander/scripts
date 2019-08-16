@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# Steve Barcomb (sbarcomb@redhat.com)
+
+
+caseno=$1
+filename=$2
+casenolen=$(echo -n $caseno | wc -m)
+dir=
+user=
+passwd=
+
+
+aria=$(command -v aria2c)
+
+if [ -z $aria ]
+then
+	echo Please install aria2
+else
+	mkdir $dir/$caseno
+	echo Downloading files to $dir/$caseno
+fi
+
+aria2c --http-user $user --http-passwd $passwd -d $dir/$caseno https://access.redhat.com/rs/cases/$caseno/attachments
+grep uri $dir/$caseno/attachments |  sed -e 's|^[ \t]*||' | sed -e 's|<uri>||g' | sed -e 's|</uri>||g' > $dir/$caseno/.attachments_cleaned
+aria2c -x 16 -j 16 --allow-overwrite false --summary-interval 0 -d $dir/$caseno --http-user $user --http-passwd $passwd -i $dir/$caseno/.attachments_cleaned
