@@ -1,6 +1,4 @@
 #!/bin/bash
-# - 08-05-2019 Added proper tuned and transparent hugepage checking.  Will show a count of devices using schedulers.  If the sys queue files are not found it will look for an elevator on the kernel command line.
-# - 08-03-2019 Modernizing some stuff
 # Steve Barcomb (sbarcomb@redhat.com)
 
 
@@ -17,7 +15,7 @@ all=$(echo "$max/$huge"|bc)
 tunedinstalled=$(grep tuned installed-rpms | wc -l)
 rhelversion=$(cat uname | awk '{print $3}' | awk -F '.' '{print $1}')
 rhel56check=$(cat etc/redhat-release | awk '{print $7}' | awk -F '.' '{print $1}')
-thpcheck=$(grep transparent_hugepage proc/cmdline | wc -l)
+thpcheck=$(grep -q transparent_hugepage proc/cmdline | wc -l)
 filecheck=$(ls sys/kernel/mm/transparent_hugepage/enabled | wc -l)
 
 syscheck=$(ls sys | grep block | wc -l)
