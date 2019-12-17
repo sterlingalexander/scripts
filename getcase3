@@ -36,7 +36,7 @@ fi
 
 # Get a listing of all of the attachments on the ticket and save it in your case directory
 
-aria2c --allow-overwrite=true --http-user $user --http-passwd $passwd -d $dir/$caseno https://access.redhat.com/rs/cases/$caseno/attachments
+aria2c --console-log-level=error --allow-overwrite=true --http-user $user --http-passwd $passwd -d $dir/$caseno https://access.redhat.com/rs/cases/$caseno/attachments
 
 
 
@@ -45,8 +45,8 @@ aria2c --allow-overwrite=true --http-user $user --http-passwd $passwd -d $dir/$c
 if [ -z $filename ]
 then
         grep uri $dir/$caseno/attachments |  sed -e 's|^[ \t]*||' | sed -e 's|<uri>||g' | sed -e 's|</uri>||g' > $dir/$caseno/.attachments_cleaned
-        aria2c -x 16 -j 16 --force-save=true --allow-overwrite=false --summary-interval 0 -d $dir/$caseno --http-user $user --http-passwd $passwd -i $dir/$caseno/.attachments_cleaned
+        aria2c -x 16 -j 16 --console-log-level=error --force-save=true --allow-overwrite=false --summary-interval 0 -d $dir/$caseno --http-user $user --http-passwd $passwd -i $dir/$caseno/.attachments_cleaned
 else
         single=$(grep -B 1 "<fileName>$filename" $dir/$caseno/attachments | head -n1 | sed -e 's|^[ \t]*||' | sed -e 's|<uri>||g' | sed -e 's|</uri>||g')
-        aria2c -x 16 -j 16 --force-save=true --allow-overwrite=false --summary-interval 0 -d $dir/$caseno --http-user $user --http-passwd $passwd $single
+        aria2c -x 16 -j 16 --console-log-level=error --force-save=true --allow-overwrite=false --summary-interval 0 -d $dir/$caseno --http-user $user --http-passwd $passwd $single
 fi
