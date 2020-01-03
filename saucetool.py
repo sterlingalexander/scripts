@@ -40,7 +40,7 @@ def insert(tree, tokens):
         tree = tree[t]
 
 
-def rpm_name_decompose(s, unsplit):
+def rpm_name_decompose(s, unsplit, hostname):
     '''
     This will split the RPM (hopefully) into the 'name' component, the full version 
     info, and the release and arch info.  Result returned as a list.
@@ -53,7 +53,11 @@ def rpm_name_decompose(s, unsplit):
     # If the length of the resulting list is 1, the name was not split.  Record it and
     #   do not add the RPM to the compare tree
     if len(result) == 1:
-        unsplit.append(result)
+        if hostname in unsplit.keys():
+            unsplit[hostname].append(result)
+        else:
+            unsplit[hostname] = []
+            unsplit[hostname].append(result)
         return None
     return result
 
@@ -65,7 +69,7 @@ def parse_rpms_to_tree(tree, rpmfile, hostname):
     """
     for line in rpmfile.readlines():
         # Send the RPM name to be split without the date
-        rpm_tokens = rpm_name_decompose(line.split()[0], unsplit)
+        rpm_tokens = rpm_name_decompose(line.split()[0], unsplit, hostname)
         # Append hostname before insertion
         try:
             rpm_tokens.append(hostname)
@@ -97,7 +101,7 @@ def add_arguments(opts):
 rpm_compare_tree = tree()
 hosts            = []
 opts             = argparse.ArgumentParser()
-unsplit          = []
+unsplit          = {}
 
 
 #################################################
@@ -137,9 +141,12 @@ if len(set(hosts)) <= 1:
 
 # List out all the RPMs that could not be parsed by the regex
 print("\nTotal number RPMs that the regex was unable to handle:\t%d" % len(unsplit) )
-print("List of unparsed RPMs which were not compared:")
-for rpm in unsplit:
-    print("\t%s" % rpm[0])
+print("List of unparsed RPMs (by host) which were not compared:\n")
+for host in unsplit:
+    print("%s:" % host)
+    for rpm in unsplit[host]:
+        print("\t%s" % rpm[0])
+    print('\n')
 
 print("\nNow listing all differences:\n")
 
