@@ -10,7 +10,7 @@ compared:
 Note:  These are paths to directories, not individual files!
 """
 
-#TODO: There is no error handling...at all.
+#TODO: There is minimal error handling.
 
 #################################################
 # Imports
@@ -41,23 +41,24 @@ def insert(tree, tokens):
 
 
 def rpm_name_decompose(s, unsplit, hostname):
-    '''
+    """
     This will split the RPM (hopefully) into the 'name' component, the full version 
     info, and the release and arch info.  Result returned as a list.
-    >>>> Note the outer parens, they are necessary to keep re.split from 
+    >> Note the outer parens, they are necessary to keep re.split from
     consuming the separator.
-    '''
+    """
     # This is a total work in progress, so let's just report whatever doesn't split
     #   for future study and refinement.
-    result =  filter(None, re.split(r'-([\d\-.]+(?:git|svn|git[\w\d]+|cvs)?[\d\-.]+)(el\d_?\d?.*|(?:el\d_?\d?|rhel\d)?.x86_64|(?:el\d)?.noarch|.\(none\)|i386)', s))
+    exp = r'-([\d\-.]+(?:git|svn|git[\w\d]+|cvs)?[\d\-.]+)(el\d_?\d?.*|(?:el\d_?\d?|rhel\d)?.x86_64|(?:el\d)?.noarch|.\(none\)|i386)'
+    result = filter(None, re.split(exp, s))
     # If the length of the resulting list is 1, the name was not split.  Record it and
     #   do not add the RPM to the compare tree
     if len(result) == 1:
         if hostname in unsplit.keys():
-            unsplit[hostname].append(result)
+            unsplit[hostname].append(result[0])
         else:
             unsplit[hostname] = []
-            unsplit[hostname].append(result)
+            unsplit[hostname].append(result[0])
         return None
     return result
 
@@ -95,13 +96,10 @@ def add_arguments(opts):
 # Definitions
 #################################################
 
-#TODO:  Probably don't need all these but it's written and working, and if arbitrary numbers of sosreports are
-#         handled the design will have to change anyway
-
 rpm_compare_tree = tree()
-hosts            = []
-opts             = argparse.ArgumentParser()
-unsplit          = {}
+hosts = []
+opts = argparse.ArgumentParser()
+unsplit = {}
 
 
 #################################################
@@ -130,8 +128,8 @@ for path in run_opts.path[0]:
         hosts.append(hn)
         parse_rpms_to_tree(rpm_compare_tree, f, hn)
     except IOError:
-        print("\n\tError attempting access to files in the following provided path:\n\t\t%s\n\tAttempting to continue...\n" 
-                % (path))
+        print("\n\tError attempting access to files in the following provided path:\n\t\t%s\n\tAttempting to "
+              "continue...\n" % path)
 
 # If we weren't able to read/parse more than one unique hostname we should stop
 if len(set(hosts)) <= 1:
@@ -139,19 +137,24 @@ if len(set(hosts)) <= 1:
     print ("\t2 unique sosreports are required to compare.\n")
     sys.exit(1)
 
-# List out all the RPMs that could not be parsed by the regex
-print("\nTotal number RPMs that the regex was unable to handle:\t%d" % len(unsplit) )
-print("List of unparsed RPMs (by host) which were not compared:\n")
+# Count all the RPMs that could not be parsed by the regex
+unique_set = []
+for host in unsplit:
+    unique_set += unsplit[host]
+
+# List all unparsed RPMs by host
+print("\nTotal number unique RPMs that the regex was unable to handle:\t%d" % len(set(unique_set)))
+print("List of unparsed RPMs by host.  IMPORTANT!:  These RPMs were not part of the comparison:\n")
 for host in unsplit:
     print("%s:" % host)
     for rpm in unsplit[host]:
-        print("\t%s" % rpm[0])
+        print("\t%s" % rpm)
     print('\n')
 
 print("\nNow listing all differences:\n")
 
 output = ""
-for rpm in rpm_compare_tree:
+for rpm in sorted(rpm_compare_tree):
     flag = False
     output = rpm + '\n'
     for version in rpm_compare_tree[rpm]:
@@ -165,6 +168,6 @@ for rpm in rpm_compare_tree:
     if flag:
         print output    
 
-# The tree build can be visualized by uncommenting the following.
+# The tree data structure can be visualized by uncommenting the following.
 #import json
 #print json.dumps(rpm_compare_tree, sort_keys=True, indent=2)
