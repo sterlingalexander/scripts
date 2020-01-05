@@ -74,29 +74,6 @@ def split_with_regex(s, regex, errlog, hostname):
     return result
 
 
-def rpm_name_decompose(s, errlog, hostname):
-    """
-    This will split the RPM (hopefully) into the 'name' component, the full version 
-    info, and the release and arch info.  Result returned as a list.
-    >> Note the outer parens, they are necessary to keep re.split from
-    consuming the separator.
-    """
-    # This is a total work in progress, so let's just report whatever doesn't split
-    #   for future study and refinement.
-    exp = r'-([\d\-.]+(?:git|svn|git[\w\d]+|cvs)?[\d\-.]+)(el\d_?\d?.*|(?:el\d_?\d?|rhel\d)?.x86_64|(?:el\d)?.noarch|.\(none\)|i386)'
-    result = filter(None, re.split(exp, s))
-    # If the length of the resulting list is 1, the name was not split.  Record it and
-    #   do not add the RPM to the compare tree
-    if len(result) == 1:
-        if hostname in errlog.keys():
-            errlog[hostname].append(result[0])
-        else:
-            errlog[hostname] = []
-            errlog[hostname].append(result[0])
-        return None
-    return result
-
-
 # ==========| Parse into data structures
 
 def parse_data_to_tree(tree, regex, errlog, data_list, hostname):
