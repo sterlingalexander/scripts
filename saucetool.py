@@ -132,7 +132,7 @@ opts = argparse.ArgumentParser()
 hosts = []
 
 # Filter list, these tokens will be removed from lists being inserted into the tree
-filter_list = ['=', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+filter_list = ['=']
 
 # Tokens which exclude the data record from tree addition.
 excluded = ['kernel.sched_domain.cpu']
