@@ -11,3 +11,4 @@
 * sar65 - RHEL 6 sysstat binary
 * sar71 - RHEL 7 sysstat binary
 * sar -A -t -f sa01 > sar01
+* saucetool.py from Sterling will compare a "good" and "bad" sosreport for differences
